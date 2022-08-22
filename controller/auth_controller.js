@@ -50,7 +50,7 @@ exports.register = async (req, res) => {
   user.password = password;
   user.confrimPassword = confrimPassword;
 
-  // check if username not exits
+
   let user_res = await user_uc.getUserByUsername(user.username);
   if (user_res !== null) {
     res_data.message = "username or email already use";

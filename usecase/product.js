@@ -75,4 +75,4 @@ let deleteProduct = async (id) => {
   };
 };
 
-module.exports = { getAllProduct, getProductByID: getProductByID, createProduct, updateProduct, deleteProduct };
+module.exports = { getAllProduct, getProductByID, getProductByID, createProduct, updateProduct, deleteProduct };

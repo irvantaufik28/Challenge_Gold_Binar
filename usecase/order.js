@@ -1,7 +1,6 @@
 const order_constants = require("../internal/constants/order");
 const product_uc = require("../usecase/product");
 let db = require("../models/index");
-const order = require("../models/order");
 const Op = require("sequelize").Op;
 
 let getPendingOrderByUserID = async (user_id) => {

@@ -24,8 +24,8 @@ exports.getOneProduct = async (req, res) => {
     message: "success",
     data: null,
   };
-  let product = await product_uc.getProudctByID(id);
-  if (!product) {
+  let product = await product_uc.getProductByID(id);
+  if (product ===null) {
     res_data.status = "failed";
     res_data.message = "product not found";
     res.status(400);
