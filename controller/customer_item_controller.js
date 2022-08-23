@@ -20,17 +20,16 @@ exports.getlistProduct = async (req, res) => {
 exports.getOneProduct = async (req, res) => {
   let id = req.params.id;
   let res_data = {
-    status: "ok",
-    message: "success",
+    status: "faild",
+    message: "product not found",
     data: null,
   };
   let product = await product_uc.getProductByID(id);
   if (product ===null) {
-    res_data.status = "failed";
-    res_data.message = "product not found";
-    res.status(400);
+    return res.status(400).json({
+      data : res_data
+    }) 
   }
-  res_data.data = product;
   res.status(200).json({
     status: "ok",
     message: "succes",
@@ -60,41 +59,39 @@ exports.getlistCategory = async (req, res) => {
 exports.getOneCategory = async (req, res) => {
   let id = req.params.id;
   let res_data = {
-    status: "ok",
-    message: "success",
+    status: "failed",
+    message: "category not found",
     data: null,
   };
   let category = await category_uc.getCategoryByID(id);
-  if (!category) {
-    res_data.status = "failed";
-    res_data.message = "product not found";
-    res.status(400);
-  }
-  res_data.data = category;
+  if (category===null) {
+    return res.status(400).json({
+      data : res_data
+    }) 
+  };
   res.status(200).json({
     status: "ok",
     message: "succes",
-    data: category,
-  });
+    data: category
+  })
 };
 
 exports.getOneProductByCategory = async (req, res) => {
   let id = req.params.id;
   let res_data = {
-    status: "ok",
-    message: "success",
+    status: "failed",
+    message: "category not found",
     data: null,
   };
   let category = await category_uc.getProductByCategory(id);
-  if (!category) {
-    res_data.status = "failed";
-    res_data.message = "product not found";
-    res.status(400);
-  }
-  res_data.data = category;
+  if (category ===null) {
+    return res.status(400).json({
+      data : res_data
+    }) 
+  };
   res.status(200).json({
     status: "ok",
     message: "succes",
-    data: category,
-  });
-};
+    data: category
+  })
+}

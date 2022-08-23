@@ -86,7 +86,10 @@ let addOrderDetails = async (order_id, items) => {
       };
 
       try {
-        await addOrderDetail(detail);
+          
+          await addOrderDetail(detail);
+        
+
       } catch (e) {
         console.log(e);
       }
