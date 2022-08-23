@@ -12,6 +12,13 @@ let getPendingOrderByUserID = async (user_id) => {
         status: order_constants.ORDER_PENDING,
       },
     });
+
+    let grandTotal = await db.orderDetail.sum("total", {
+      where: { order_id: order.id },
+    });
+  
+    order.setDataValue("grandTotal", grandTotal);
+
   } catch (e) {
     console.log(e);
   }
@@ -20,11 +27,6 @@ let getPendingOrderByUserID = async (user_id) => {
     return order;
   }
 
-  let grandTotal = await db.orderDetail.sum("total", {
-    where: { order_id: order.id },
-  });
-
-  order.setDataValue("grandTotal", grandTotal);
 
   return {
     ...order.dataValues,
@@ -39,34 +41,156 @@ let getDetailOrder = async (order_id) => {
       where: { order_id: order_id },
     });
   } catch (e) {
-    console.log(e);
+    console.log(e)
   }
 
-  return details;
+  return details
 };
 
-let createOrder = async (user_id, items) => {
+let createOrUpdateOrder = async (user_id, items) => {
+  
   let is_success = false;
-  let order = {
+ 
+  
+  let data = {
     user_id: user_id,
     status: order_constants.ORDER_PENDING,
   };
 
-  let res_order = null;
+  let order =null 
+  let checkStock = await validateStock(items)
+  if(checkStock.is_success){
+
+  
+
   try {
-    res_order = await db.order.create(order);
+    let order = await getPendingOrderByUserID(user_id);
+    await db.order.create(data, { where: { id: order.id } });
+
+    for (let i = 0; i < items.length; i++) {
+      const product = await product_uc.getProductByID(items[i].id);
+      if (product !== null) {
+        const existData = await db.orderDetail.findOne({ where: { product_id: product.id, order_id: order.id } });
+
+        if (existData !== null) {
+          await existData.update({ 
+            qty: items[i].qty,
+            total: product.price * items[i].qty
+          });
+        } else {
+          let detailData = items[i];
+          detailData.product_id = product.id;
+          detailData.price = product.price * items.qty
+          detailData.order_id = order.id;
+
+          await addOrderDetail(detailData);
+        }
+      }
+    }
+
     order = await getPendingOrderByUserID(user_id);
-    await addOrderDetails(order.id, items);
+
     is_success = true;
   } catch (e) {
     console.log(e);
   }
-
+  }else{
+    is_success = false
+    message = checkStock.message
+  }
   return {
     is_success: is_success,
     order: order,
+    message : message
   };
-};
+  
+  
+  // let is_success = false;
+  // let message = "success"
+  // let data = {
+  //   user_id: user_id,
+  //   status: order_constants.ORDER_PENDING,
+  // };
+
+  // let order = null;
+  // let checkStock = await validateStock(items)
+  // if(checkStock.is_success){
+
+  // try {
+
+  //   let existOrder = await getPendingOrderByUserID(user_id)
+  //   if(existOrder === null){
+  //     await db.order.create(data);
+  //     } else {
+  //       await db.order.update(data, {
+  //         where: {
+  //           id: order.id
+  //         }
+  //       })
+  //       for(let i =0; i<items.length; i++){
+  //         let product = await product_uc.getProductByID(items[i].id)
+  //         if(product !== null){
+  //         let existData = await db.orderDetail.findOne({
+  //             where : {
+  //               product_id: product.id,
+  //               order_id:order.id
+  //             }
+  //           })
+  //           if(existData !==null){
+  //             await existData.update({
+  //               qty: items[i].qty
+  //             })
+  //           } else {
+  //             let detailData = items[i]
+  //             detailData.product_id = product.id
+  //             detailData.price = product.price
+  //             detailData.order_id = order.id
+
+  //             await addOrderDetail(detailData)
+  //           }
+  //         }
+  //       }
+
+  //     }
+  //   order = await getPendingOrderByUserID(user_id);
+  //   await addOrderDetails(order.id, items);
+  //   is_success = true;
+  // } catch (e) {
+  //   console.log(e);
+  // }
+  // }else{
+  //   is_success = false
+  //   message = checkStock.message
+  // }
+  // return {
+  //   is_success,
+  //   order,
+  //   message
+  // };
+}
+
+let validateStock = async (items) =>{
+  let is_success = true
+  let message = "success"
+
+  for(let i = 0; i < items.length; i++){
+    let product = await product_uc.getProductByID(items[i].id)
+    let qty = items[i].qty
+    let stock = product.stock
+
+    if(qty > stock){
+      is_success = false
+      message = `stock ${product.name} kurang dari ${qty}`
+      break;
+    }
+  }
+  return{
+    is_success,
+    message,
+  
+  }
+}
+
 
 let addOrderDetails = async (order_id, items) => {
   for (let i = 0; i < items.length; i++) {
@@ -219,7 +343,7 @@ let updateOrder = async (user_id, items) => {
 module.exports = {
   getPendingOrderByUserID: getPendingOrderByUserID,
   getDetailOrder: getDetailOrder,
-  createOrder: createOrder,
+  createOrUpdateOrder:createOrUpdateOrder,
   addOrderDetails: addOrderDetails,
   changeOrderStatus: changeOrderStatus,
   listOrderExcludePending: listOrderExcludePending,
