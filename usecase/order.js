@@ -111,6 +111,7 @@ let changeOrderStatus = async (order_id, status) => {
       where: { id: order_id },
     }
   );
+
 };
 
 let listOrderExcludePending = async () => {

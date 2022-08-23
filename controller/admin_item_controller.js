@@ -1,7 +1,5 @@
 const product_uc = require('../usecase/product')
 const category_uc = require('../usecase/category')
-let order_const = require("../internal/constants/order");
-let order_uc = require("../usecase/order");
 
 
 exports.addProduct= async(req, res)=>{
@@ -12,16 +10,20 @@ exports.addProduct= async(req, res)=>{
         data: null
     }
     let create_res = await product_uc.createProduct (product)
+    let category = await category_uc.getCategoryByID(product.category_id)
+    if(category===null){
+        res_data.message = 'category tidak ditemukan'
+        return res.status(400).json(res_data)
+    }
     if(create_res.is_success !== true) {
         res_data.message = 'something went wrong'
         return res.status(400).json(res_data)
     }
-
-    res_data.status = 'ok'
-    res_data.message = 'success'
-    res_data.data = create_res.product
-
-    res.json(res_data)
+    res.status(200).json({
+        status : "ok",
+        message : "Berhasil menanbahkan product",
+        data : create_res.product
+    })
 }
 
 exports.editProduct =async (req, res)=>{
@@ -33,18 +35,21 @@ exports.editProduct =async (req, res)=>{
         message: '',
         data: null
     }
-
+    let category = await category_uc.getCategoryByID(product.category_id)
+    if(category===null){
+        res_data.message = 'category tidak ditemukan'
+        return res.status(400).json(res_data)
+    }
     let update_res = await product_uc.updateProduct(product ,id)
     if(update_res.is_success !== true) {
         res_data.message = 'something went wrong'
         return res.status(400).json(res_data)
     }
-    res_data.status = 'ok'
-    res_data.message = 'success'
-    res_data.data = update_res.product
-
-
-    res.json(res_data)
+    res.status(200).json({
+        status : "ok",
+        message : "Berhasil mengUpdate product",
+        data : update_res.product
+    })
 }
 
 exports.delete = async (req, res)=>{
@@ -56,14 +61,16 @@ exports.delete = async (req, res)=>{
     }
     let delete_res = await product_uc.deleteProduct(id)
     if(delete_res.is_success !== true) {
-        res_data.message = 'something went wrong'
-        return res.status(400).json(res_data)
+        res.status(400).json({
+            message : "Gagal retive data",
+            data :res_data
+        })     
     }
-    res_data.status = 'ok'
-    res_data.message = 'success'
-    res_data.data = delete_res
-
-    res.json(res_data)
+    res.status(200).json({
+        status : "ok",
+        message : "Berhasil menghapus product",
+        data :delete_res
+    })
 }
 
 
@@ -83,11 +90,11 @@ exports.addCategory= async(req, res)=>{
         return res.status(400).json(res_data)
     }
 
-    res_data.status = 'ok'
-    res_data.message = 'success'
-    res_data.data = create_res.category
-
-    res.json(res_data)
+    res.status(200).json({
+        status : "ok",
+        message : "Berhasil menanbahkan Category",
+        data : create_res.category
+    })
 }
 
 
@@ -103,9 +110,9 @@ exports.destroyCategory = async (req, res)=>{
         res_data.message = 'something went wrong'
         return res.status(400).json(res_data)
     }
-    res_data.status = 'ok'
-    res_data.message = 'success'
-    res_data.data = delete_res
-
-    res.json(res_data)
+    res.status(200).json({
+        status : "ok",
+        message : "Berhasil menghapus category",
+        data :delete_res
+    })
 }
