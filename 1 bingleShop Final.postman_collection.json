@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\" : \"aku\",\r\n    \"username\": \"akyu\",\r\n    \"password\": \"password\",\r\n    \"confrimPassword\": \"password\",\r\n    \"email\": \"adamemail\"\r\n}",
+							"raw": "{\r\n    \"name\" : \"cindy\",\r\n    \"username\": \"cindy\",\r\n    \"password\": \"password\",\r\n    \"confrimPassword\": \"password\"\r\n    \r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -44,7 +44,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"irvan29\",\r\n    \"password\": \"password\"\r\n}",
+							"raw": "{\r\n    \"username\": \"irvan\",\r\n    \"password\": \"password\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -60,6 +60,34 @@
 							"port": "3000",
 							"path": [
 								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/customer/product/detail/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"customer",
+								"product",
+								"detail",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": null
+								}
 							]
 						}
 					},
@@ -279,124 +307,117 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "get orders - complete",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/admin/order?status=completed",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"admin",
+										"order"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "completed"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get order by user id",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Sate\",\r\n    \"category\": \"makanan\",\r\n    \"harga\": 50000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/admin/order/:id",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"admin",
+										"order",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": null
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get orders",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Sate\",\r\n    \"category\": \"makanan\",\r\n    \"harga\": 50000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/admin/order",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"admin",
+										"order"
+									]
+								}
+							},
+							"response": []
 						}
 					]
-				},
-				{
-					"name": "get orders - complete",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3000/admin/order?status=completed",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"admin",
-								"order"
-							],
-							"query": [
-								{
-									"key": "status",
-									"value": "completed"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get order by user id",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Sate\",\r\n    \"category\": \"makanan\",\r\n    \"harga\": 50000\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3000/admin/order/:id",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"admin",
-								"order",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": null
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get orders",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Sate\",\r\n    \"category\": \"makanan\",\r\n    \"harga\": 50000\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3000/customer/order/:id",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"customer",
-								"order",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "1"
-								}
-							]
-						}
-					},
-					"response": []
 				}
 			]
 		},
@@ -452,7 +473,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:3000/customer/product/:id",
+									"raw": "http://localhost:3000/customer/product/detail/:id",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -461,12 +482,13 @@
 									"path": [
 										"customer",
 										"product",
+										"detail",
 										":id"
 									],
 									"variable": [
 										{
 											"key": "id",
-											"value": "1"
+											"value": null
 										}
 									]
 								}
@@ -479,7 +501,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:3000/customer/category/:id",
+									"raw": "http://localhost:3000/customer/category/detail/:id",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -488,12 +510,13 @@
 									"path": [
 										"customer",
 										"category",
+										"detail",
 										":id"
 									],
 									"variable": [
 										{
 											"key": "id",
-											"value": null
+											"value": "1"
 										}
 									]
 								}
@@ -572,7 +595,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"items\": [\r\n        {\r\n            \"id\": 3,\r\n            \"qty\": 0\r\n        },\r\n        {\r\n            \"id\": 2,\r\n            \"qty\": 1\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"items\": [\r\n       \r\n        {\r\n            \"id\": 1,\r\n            \"qty\": 1\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -580,7 +603,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:3000/customer/order/edit/?id=6",
+									"raw": "http://localhost:3000/customer/order/update?user_id=3",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -589,13 +612,12 @@
 									"path": [
 										"customer",
 										"order",
-										"edit",
-										""
+										"update"
 									],
 									"query": [
 										{
-											"key": "id",
-											"value": "6"
+											"key": "user_id",
+											"value": "3"
 										}
 									]
 								}
