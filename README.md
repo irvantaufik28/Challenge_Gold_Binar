@@ -34,6 +34,7 @@ sequelize db:seed:all
   - when create order automatically you have order status "PENDING"
   - first insert you user_id on query params, then
   - fill all attributes
+  - here is a condition where if stock < qty, you order cant be create and you will have some warnig.
  
  example : 
  ```
