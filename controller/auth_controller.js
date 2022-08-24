@@ -19,6 +19,9 @@ exports.login = async (req, res) => {
   if (bcrypt.compareSync(password, user.password) !== true) {
     return res.status(400).json(res_data);
   }
+  user =user.toJSON()
+  delete user.password
+
   res_data.status = "ok";
   res_data.message = "success";
   res_data = user;
@@ -62,7 +65,7 @@ exports.register = async (req, res) => {
     res_data.message = "somthing went wrong";
     return res.status(400).json(res_data);
   }
-
+ 
   res_data.status = "ok";
   res_data.message = "succes";
   res_data.data = create_res.user;
