@@ -13,11 +13,15 @@ let getPendingOrderByUserID = async (user_id) => {
       },
     });
 
-    let grandTotal = await db.orderDetail.sum("total", {
-      where: { order_id: order.id },
-    });
+    if (order != null) {
+      let grandTotal = await db.orderDetail.sum("total", {
+        where: {
+          order_id: order.id
+        },
+      });
 
-    order.setDataValue("grandTotal", grandTotal);
+      order.setDataValue("grandTotal", grandTotal);
+    }
   } catch (e) {
     console.log(e);
   }
@@ -36,7 +40,9 @@ let getDetailOrder = async (order_id) => {
   let details = [];
   try {
     details = await db.orderDetail.findAll({
-      where: { order_id: order_id },
+      where: {
+        order_id: order_id
+      },
     });
   } catch (e) {
     console.log(e);
@@ -58,19 +64,18 @@ let createOrUpdateOrder = async (user_id, items) => {
 
   if (checkStock.is_success) {
     try {
-      
-      let existOrder = await getPendingOrderByUserID(user_id);
-      if(existOrder ===null){
-        await db.order.create(data)
-      } 
 
-       order = await getPendingOrderByUserID(user_id);
-      
+      let order = await getPendingOrderByUserID(user_id);
+      if (order === null) {
+        order = await db.order.create(data)
+      }
+
       await db.order.update(data, {
         where: {
           id: order.id
         }
       });
+
       for (let i = 0; i < items.length; i++) {
         const product = await product_uc.getProductByID(items[i].id);
         if (product !== null) {
@@ -94,13 +99,22 @@ let createOrUpdateOrder = async (user_id, items) => {
 
             await addOrderDetail(detailData);
           }
-        }        
+        }
       }
+
+      await db.orderDetail.destroy({
+        where: {
+          order_id: order.id,
+          product_id: {
+            [Op.notIn]: items.map((val) => val.id),
+          },
+        },
+      });
     } catch (e) {
       console.log(e);
     }
+
     order = await getPendingOrderByUserID(user_id);
-    await addOrderDetails(order.id, items);
     is_success = true;
   } else {
     is_success = false;
@@ -170,21 +184,19 @@ let addOrderDetail = async (data) => {
 };
 
 let changeOrderStatus = async (order_id, status) => {
-  await db.order.update(
-    {
-      status: status,
+  await db.order.update({
+    status: status,
+  }, {
+    where: {
+      id: order_id
     },
-    {
-      where: { id: order_id },
-    }
-  );
+  });
 };
 
 let listOrderExcludePending = async () => {
   let orders = await db.order.findAll({
     where: {
-      [Op.and]: [
-        {
+      [Op.and]: [{
           status: {
             [Op.ne]: order_constants.ORDER_PENDING,
           },
@@ -208,8 +220,7 @@ let listOrderExcludePending = async () => {
 let listCompletedOrder = async () => {
   let orders = await db.order.findAll({
     where: {
-      [Op.or]: [
-        {
+      [Op.or]: [{
           status: order_constants.ORDER_COMPLETED,
         },
         {
@@ -237,17 +248,26 @@ let updateOrder = async (user_id, items) => {
 
   try {
     let order = await getPendingOrderByUserID(user_id);
-    await db.order.update(data, { where: { id: order.id } });
+    await db.order.update(data, {
+      where: {
+        id: order.id
+      }
+    });
 
     for (let i = 0; i < items.length; i++) {
       const product = await product_uc.getProductByID(items[i].id);
       if (product !== null) {
         const existData = await db.orderDetail.findOne({
-          where: { product_id: product.id, order_id: order.id },
+          where: {
+            product_id: product.id,
+            order_id: order.id
+          },
         });
 
         if (existData !== null) {
-          await existData.update({ qty: items[i].qty });
+          await existData.update({
+            qty: items[i].qty
+          });
         } else {
           let detailData = items[i];
           detailData.product_id = product.id;

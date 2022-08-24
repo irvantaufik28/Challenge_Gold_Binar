@@ -29,31 +29,31 @@ exports.login = async (req, res) => {
 };
 
 exports.register = async (req, res) => {
-  if (req.body.password != req.body.confrimPassword) {
-    res_data.message = "password & confrim password invalid";
-    return res.status(400).json(res_data);
-  }
-
+  
+  let res_data = {
+    status: "failed",
+    message: "",
+    data: null,
+  };
   let user = {
     name: req.body.name,
     username: req.body.username,
     email: req.body.email,
     is_admin: false,
   };
-
+  
+  if (req.body.password != req.body.confrimPassword) {
+    res_data.message = "password & confrim password invalid";
+    return res.status(400).json(res_data);
+  }
   let password = bcrypt.hashSync(req.body.password, 10);
   let confrimPassword = bcrypt.hashSync(req.body.confrimPassword, 10);
 
-  let res_data = {
-    status: "failed",
-    message: "",
-    data: null,
-  };
 
   user.password = password;
   user.confrimPassword = confrimPassword;
 
-
+  // check if username not exits
   let user_res = await user_uc.getUserByUsername(user.username);
   if (user_res !== null) {
     res_data.message = "username or email already use";
@@ -65,7 +65,7 @@ exports.register = async (req, res) => {
     res_data.message = "somthing went wrong";
     return res.status(400).json(res_data);
   }
- 
+
   res_data.status = "ok";
   res_data.message = "succes";
   res_data.data = create_res.user;
