@@ -2,7 +2,7 @@
   "development": {
     "username": "postgres",
     "password": "admin",
-    "database": "bingleshop_20",
+    "database": "bingleshop_irvan",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },

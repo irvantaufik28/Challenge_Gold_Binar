@@ -266,7 +266,9 @@ let updateOrder = async (user_id, items) => {
 
         if (existData !== null) {
           await existData.update({
-            qty: items[i].qty
+            qty: items[i].qty,
+            price: product.price,
+            total: product.price * items[i].qty
           });
         } else {
           let detailData = items[i];

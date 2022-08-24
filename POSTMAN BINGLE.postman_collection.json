@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "558cc010-d2f9-484d-b5f8-fdb608eb7b54",
-		"name": "1 bingleShop Final",
+		"name": "POSTMAN BINGLE",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "21868515"
 	},
@@ -60,34 +60,6 @@
 							"port": "3000",
 							"path": [
 								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get user by id",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/customer/product/detail/:id",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"customer",
-								"product",
-								"detail",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": null
-								}
 							]
 						}
 					},
@@ -279,7 +251,7 @@
 					"name": "order",
 					"item": [
 						{
-							"name": "update order status",
+							"name": "update order status by order id",
 							"request": {
 								"method": "PATCH",
 								"header": [],
