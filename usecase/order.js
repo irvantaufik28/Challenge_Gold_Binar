@@ -1,6 +1,7 @@
 const order_constants = require("../internal/constants/order");
 const product_uc = require("../usecase/product");
 let db = require("../models/index");
+const user = require("../models/user");
 const Op = require("sequelize").Op;
 
 let getPendingOrderByUserID = async (user_id) => {
@@ -184,6 +185,21 @@ let addOrderDetail = async (data) => {
 };
 
 let changeOrderStatus = async (order_id, status) => {
+ let user_order_id = await getDetailOrder(order_id)
+
+ user_order_id.forEach(async item => {
+  let item_data = await product_uc.getProductByID(item.id)
+  if(item_data.stock <=0){
+    return
+  }else{
+    await updateStock(
+      item.id,
+      item.qty,
+      order_constants.ORDER_COMPLETED
+    )
+  }
+ });
+ 
   await db.order.update({
     status: status,
   }, {
@@ -236,6 +252,27 @@ let listCompletedOrder = async () => {
 
   return orders;
 };
+
+
+let updateStock = async (product_id, qty, status) =>{
+ productByID = await product_uc.getProductByID(product_id)
+
+
+ let newStock = 0
+  try {
+
+    if(status === order_constants.ORDER_COMPLETED){
+    newStock = productByID.stock - qty
+    }
+    return await db.product.update(
+      {stock: newStock },
+      {where: {id:product_id}}
+    )
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 
 let updateOrder = async (user_id, items) => {
   let is_success = false;
@@ -312,4 +349,5 @@ module.exports = {
   listOrderExcludePending: listOrderExcludePending,
   listCompletedOrder: listCompletedOrder,
   updateOrder: updateOrder,
+  updateStock:updateStock
 };
