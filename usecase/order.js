@@ -1,7 +1,8 @@
 const order_constants = require("../internal/constants/order");
 const product_uc = require("../usecase/product");
 let db = require("../models/index");
-const user = require("../models/user");
+const product = require("../models/product");
+
 const Op = require("sequelize").Op;
 
 let getPendingOrderByUserID = async (user_id) => {
@@ -98,6 +99,8 @@ let createOrUpdateOrder = async (user_id, items) => {
             detailData.price = product.price;
             detailData.order_id = order.id;
 
+            delete detailData.id
+
             await addOrderDetail(detailData);
           }
         }
@@ -188,12 +191,12 @@ let changeOrderStatus = async (order_id, status) => {
  let user_order_id = await getDetailOrder(order_id)
 
  user_order_id.forEach(async item => {
-  let item_data = await product_uc.getProductByID(item.id)
-  if(item_data.stock <=0){
+  let product = await product_uc.getProductByID(item.product_id)
+  if(product.stock <=0){
     return
   }else{
-    await updateStock(
-      item.id,
+   await updateStock(
+      item.product_id,
       item.qty,
       order_constants.ORDER_COMPLETED
     )
@@ -255,15 +258,17 @@ let listCompletedOrder = async () => {
 
 
 let updateStock = async (product_id, qty, status) =>{
- productByID = await product_uc.getProductByID(product_id)
+  let product = await product_uc.getProductByID(product_id)
 
 
  let newStock = 0
   try {
 
     if(status === order_constants.ORDER_COMPLETED){
-    newStock = productByID.stock - qty
-    }
+    newStock = product.stock - qty
+    } 
+
+
     return await db.product.update(
       {stock: newStock },
       {where: {id:product_id}}
@@ -312,6 +317,9 @@ let updateOrder = async (user_id, items) => {
           detailData.product_id = product.id;
           detailData.price = product.price;
           detailData.order_id = order.id;
+
+          delete detailData.id
+
 
           await addOrderDetail(detailData);
         }
