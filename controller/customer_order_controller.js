@@ -13,30 +13,30 @@ exports.getOrder = async (req, res) => {
     return res.status(404).json(res_data);
   }
   res.status(200).json({
-    status : "ok",
-    message : "success",
-    data : res_data.data
-})
+    status: "ok",
+    message: "success",
+    data: res_data.data
+  })
 };
 
-exports.addOrder = async (req, res) =>{
+exports.addOrder = async (req, res) => {
   let id = req.query.id
   let items = req.body.items
   let order = await order_uc.getPendingOrderByUserID(id)
 
   let res_data = {
-    status : "failed",
-    message : "something went wrong",
-    data : null
+    status: "failed",
+    message: "something went wrong",
+    data: null
   }
   let create_res = await order_uc.createOrUpdateOrder(id, items)
-  if(create_res.is_success !== true){
+  if (create_res.is_success !== true) {
     res_data.message = create_res.message
     return res.status(400).json(res_data)
   }
   order = await order_uc.getPendingOrderByUserID(id)
-  
-  res_data.status= "ok"
+
+  res_data.status = "ok"
   res_data.message = "success"
   res_data.data = order
 

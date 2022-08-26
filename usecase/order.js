@@ -1,7 +1,6 @@
 const order_constants = require("../internal/constants/order");
 const product_uc = require("../usecase/product");
 let db = require("../models/index");
-const product = require("../models/product");
 
 const Op = require("sequelize").Op;
 
@@ -34,11 +33,39 @@ let getPendingOrderByUserID = async (user_id) => {
 
   return {
     ...order.dataValues,
-    details: await getDetailOrder(order.id),
+    details: await getOrderDetails(order.id),
   };
 };
 
-let getDetailOrder = async (order_id) => {
+let getOrderById = async (id) => {
+  let order = null;
+  try {
+    order = await db.order.findByPk(id);
+
+    if (order != null) {
+      let grandTotal = await db.orderDetail.sum("total", {
+        where: {
+          order_id: order.id
+        },
+      });
+
+      order.setDataValue("grandTotal", grandTotal);
+    }
+  } catch (e) {
+    console.log(e);
+  }
+
+  if (order === null) {
+    return order;
+  }
+
+  return {
+    ...order.dataValues,
+    details: await getOrderDetails(order.id),
+  };
+}
+
+let getOrderDetails = async (order_id) => {
   let details = [];
   try {
     details = await db.orderDetail.findAll({
@@ -188,9 +215,10 @@ let addOrderDetail = async (data) => {
 };
 
 let changeOrderStatus = async (order_id, status) => {
-  let order = await getDetailOrder(order_id)
+  let order = await db.order.findByPk(order_id)
+  let orderDetail = await getOrderDetails(order_id)
 
-  order.forEach(async item => {
+  orderDetail.forEach(async item => {
     let product = await product_uc.getProductByID(item.product_id)
     if (product.stock <= 0) {
       return
@@ -204,7 +232,7 @@ let changeOrderStatus = async (order_id, status) => {
             order_constants.ORDER_PROCESSED
           )
         }
-        if (status === order_constants.ORDER_CANCELED) {
+        if (status === order_constants.ORDER_CANCELED && order.status === order_constants.ORDER_PROCESSED) {
           await updateStock(
             item.product_id,
             item.qty,
@@ -216,6 +244,7 @@ let changeOrderStatus = async (order_id, status) => {
     }
   });
 
+
   await db.order.update({
     status: status,
   }, {
@@ -224,8 +253,6 @@ let changeOrderStatus = async (order_id, status) => {
     },
   });
 };
-
-
 
 
 let listOrderExcludePending = async () => {
@@ -273,24 +300,28 @@ let listCompletedOrder = async () => {
 };
 
 
-let updateStock = async (product_id, qty, status) =>{
+let updateStock = async (product_id, qty, status) => {
   let product = await product_uc.getProductByID(product_id)
 
 
- let newStock = 0
+  let newStock = 0
   try {
 
-    if(status === order_constants.ORDER_PROCESSED){
-    newStock = product.stock - qty
-    } if(status === order_constants.ORDER_CANCELED){
+    if (status === order_constants.ORDER_PROCESSED) {
+      newStock = product.stock - qty
+    }
+    if (status === order_constants.ORDER_CANCELED) {
       newStock = product.stock + qty
     }
 
 
-    return await db.product.update(
-      {stock: newStock },
-      {where: {id:product_id}}
-    )
+    return await db.product.update({
+      stock: newStock
+    }, {
+      where: {
+        id: product_id
+      }
+    })
   } catch (error) {
     console.log(error)
   }
@@ -368,12 +399,13 @@ let updateOrder = async (user_id, items) => {
 
 module.exports = {
   getPendingOrderByUserID: getPendingOrderByUserID,
-  getDetailOrder: getDetailOrder,
+  getOrderById: getOrderById,
+  getOrderDetails: getOrderDetails,
   createOrUpdateOrder: createOrUpdateOrder,
   addOrderDetails: addOrderDetails,
   changeOrderStatus: changeOrderStatus,
   listOrderExcludePending: listOrderExcludePending,
   listCompletedOrder: listCompletedOrder,
   updateOrder: updateOrder,
-  updateStock:updateStock
+  updateStock: updateStock
 };
