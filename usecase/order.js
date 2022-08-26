@@ -188,21 +188,34 @@ let addOrderDetail = async (data) => {
 };
 
 let changeOrderStatus = async (order_id, status) => {
- let user_order_id = await getDetailOrder(order_id)
+  let order = await getDetailOrder(order_id)
 
- user_order_id.forEach(async item => {
-  let product = await product_uc.getProductByID(item.product_id)
-  if(product.stock <=0){
-    return
-  }else{
-   await updateStock(
-      item.product_id,
-      item.qty,
-      order_constants.ORDER_COMPLETED
-    )
-  }
- });
- 
+  order.forEach(async item => {
+    let product = await product_uc.getProductByID(item.product_id)
+    if (product.stock <= 0) {
+      return
+    } else {
+
+      if (order.status != status) {
+        if (status === order_constants.ORDER_PROCESSED) {
+          await updateStock(
+            item.product_id,
+            item.qty,
+            order_constants.ORDER_PROCESSED
+          )
+        }
+        if (status === order_constants.ORDER_CANCELED) {
+          await updateStock(
+            item.product_id,
+            item.qty,
+            order_constants.ORDER_CANCELED
+          )
+        }
+      }
+
+    }
+  });
+
   await db.order.update({
     status: status,
   }, {
@@ -211,6 +224,9 @@ let changeOrderStatus = async (order_id, status) => {
     },
   });
 };
+
+
+
 
 let listOrderExcludePending = async () => {
   let orders = await db.order.findAll({
@@ -264,9 +280,11 @@ let updateStock = async (product_id, qty, status) =>{
  let newStock = 0
   try {
 
-    if(status === order_constants.ORDER_COMPLETED){
+    if(status === order_constants.ORDER_PROCESSED){
     newStock = product.stock - qty
-    } 
+    } if(status === order_constants.ORDER_CANCELED){
+      newStock = product.stock + qty
+    }
 
 
     return await db.product.update(
