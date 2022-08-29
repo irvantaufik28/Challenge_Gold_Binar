@@ -8,6 +8,7 @@ module.exports = {
                 username: "admin",
                 is_admin: true,
                 password: bcrypt.hashSync('123456', 10),
+                refresh_token: null,
                 createdAt: new Date(),
                 updatedAt: new Date()
 

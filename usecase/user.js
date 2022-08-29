@@ -37,6 +37,22 @@ createUser : async (user) =>{
         is_success : is_success,
         user : user
     }
-}
+},
+updateUser : async (user, id) =>{
+    let is_success = false
+    try {
+        user = await db.user.update(user ,{
+            where : {id :id}
+        })
+        is_success = true
+    } catch (error) {
+        console.log(error)
+    }
+    return {
+        is_success : is_success,
+        user : user
+    }
+},
+
 
 }

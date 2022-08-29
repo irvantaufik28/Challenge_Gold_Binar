@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const customer_order = require("../controller/customer_order_controller");
 const customer_item = require("../controller/customer_item_controller");
+const verifyToken =require('../middleware/verifyToken')
+
+
 
 // customer order
 router.get("/order/:id", customer_order.getOrder);
@@ -12,7 +15,7 @@ router.put("/order/update", customer_order.updateOrderCustomer);
 router.patch("/order/sumbit/:id", customer_order.changeStatus);
 
 // customer item
-router.get("/product", customer_item.getlistProduct);
+router.get("/product", verifyToken.verifyToken,customer_item.getlistProduct);
 router.get("/product/detail/:id", customer_item.getOneProduct);
 
 // customer category

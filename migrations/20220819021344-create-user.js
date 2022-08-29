@@ -20,6 +20,9 @@ module.exports = {
       is_admin: {
         type: Sequelize.BOOLEAN
       },
+      refresh_token: {
+        type: Sequelize.TEXT
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

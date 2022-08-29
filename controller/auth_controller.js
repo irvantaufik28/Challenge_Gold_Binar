@@ -1,35 +1,47 @@
 const bcrypt = require("bcrypt");
-
 const user_uc = require("../usecase/user");
+const jwt = require('jsonwebtoken')
 
 exports.login = async (req, res) => {
-  let username = req.body.username;
-  let password = req.body.password;
+  let user_data = req.body.username
 
-  let res_data = {
-    status: "failed",
-    message: "incorrect username or password",
-    res_data: null,
-  };
+  let user = await user_uc.getUserByUsername(user_data)
+  let match = await bcrypt.compare(req.body.password, user.password)
+  if (!match) return res.status(400).json({ message: "incorrect email or passwor" })
 
-  let user = await user_uc.getUserByUsername(username);
-  if (!user) {
-    return res.status(400).json(res_data);
-  }
-  if (bcrypt.compareSync(password, user.password) !== true) {
-    return res.status(400).json(res_data);
-  }
-  user =user.toJSON()
-  delete user.password
+ 
+  let user_id = user.id
+  let username =user.username
+  let name= user.name
+  let is_admin = user.is_admin
+  let  refesh_token = user.refesh_token
 
-  res_data.status = "ok";
-  res_data.message = "success";
-  res_data = user;
-  return res.json(res_data);
-};
+  
+  const accessToken = jwt.sign({ user_id, username, name, is_admin, refesh_token }, process.env.ACCES_TOKEN_SECRET, {
+    expiresIn: '60'
+  })
+
+  const refeshToken = jwt.sign({ user_id, username, name, is_admin, refesh_token }, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: '1d'
+  })
+
+  await user_uc.updateUser(refesh_Token = refeshToken, user_id)
+
+  res.cookie('refreshToken', refeshToken, {
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000
+  })
+  res.json({
+    id : user_id,
+    username : username,
+    accessToken:accessToken
+  })
+}
+
+
 
 exports.register = async (req, res) => {
-  
+
   let res_data = {
     status: "failed",
     message: "",
@@ -41,7 +53,7 @@ exports.register = async (req, res) => {
     email: req.body.email,
     is_admin: false,
   };
-  
+
   if (req.body.password != req.body.confrimPassword) {
     res_data.message = "password & confrim password invalid";
     return res.status(400).json(res_data);
